@@ -1,0 +1,96 @@
+def initgrid():
+    grid = [[-1 for _ in range(3)] for _ in range(3)]
+    return grid
+
+def evaluate(grid):
+    for row in range(3):
+        if grid[row][0] == grid[row][1] == grid[row][2] != -1:
+            if grid[row][0] == 0:
+                return 10
+            elif grid[row][0] == 1:
+                return -10
+    for col in range(3):
+        if grid[0][col] == grid[1][col] == grid[2][col] != -1:
+            if grid[0][col] == 0:
+                return 10
+            elif grid[0][col] == 1:
+                return -10
+    if grid[0][0] == grid[1][1] == grid[2][2] != -1:
+        if grid[0][0] == 0:
+            return 10
+        elif grid[0][0] == 1:
+            return -10
+    if grid[0][2] == grid[1][1] == grid[2][0] != -1:
+        if grid[0][2] == 0:
+            return 10
+        elif grid[0][2] == 1:
+            return -10
+    return 0
+
+def is_game_over(grid):
+    if evaluate(grid) != 0:
+        return True
+    for row in range(3):
+        for col in range(3):
+            if grid[row][col] == -1:
+                return False
+    return True
+
+def bestMove(grid, depth, is_maximizing_player):
+    score = evaluate(grid)
+    if score != 0:
+        return score
+    if is_game_over(grid):
+        return 0
+    if is_maximizing_player:
+        max_eval = -float('inf')
+        for row in range(3):
+            for col in range(3):
+                if grid[row][col] == -1:
+                    grid[row][col] = 0
+                    eval = bestMove(grid, depth + 1, False)
+                    grid[row][col] = -1
+                    max_eval = max(max_eval, eval)
+        return max_eval
+    else:
+        min_eval = float('inf')
+        for row in range(3):
+            for col in range(3):
+                if grid[row][col] == -1:
+                    grid[row][col] = 1
+                    eval = bestMove(grid, depth + 1, True)
+                    grid[row][col] = -1
+                    min_eval = min(min_eval, eval)
+        return min_eval
+
+def find_best_move(grid):
+    best_eval = -float('inf')
+    best_move = (-1, -1)
+    for row in range(3):
+        for col in range(3):
+            if grid[row][col] == -1:
+                grid[row][col] = 0
+                move_eval = bestMove(grid, 0, False)
+                grid[row][col] = -1
+                if move_eval > best_eval:
+                    best_eval = move_eval
+                    best_move = (row, col)
+    return best_move
+
+my_grid = initgrid()
+move = find_best_move(my_grid)
+while(1):
+  userR = int(input())
+  userC = int(input())
+  my_grid[userR][userC] = 1
+  for row in my_grid:
+    for val in row:
+      print(val, end=" ")
+    print()
+  move = find_best_move(my_grid)
+  print(f"Best move for 0 (AI) is: {move}")
+  my_grid[move[0]][move[1]] = 0
+  for row in my_grid:
+    for val in row:
+      print(val, end=" ")
+    print()
